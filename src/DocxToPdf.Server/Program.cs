@@ -35,12 +35,16 @@ app.MapPost("/api/convert", async (HttpRequest request) =>
     if (file.Length > 50 * 1024 * 1024)
         return Results.BadRequest(new ErrorResponse("File size exceeds 50 MB limit"));
 
-    var tempDir = Path.Combine(Path.GetTempPath(), "DocxToPdf", Guid.NewGuid().ToString());
-    Directory.CreateDirectory(tempDir);
+    // Declare tempDir before try for finally access
+    string? tempDir = null;
+    var cleanupNeeded = true;
 
     try
     {
-        var inputPath = Path.Combine(tempDir, file.FileName);
+        tempDir = Path.Combine(Path.GetTempPath(), "DocxToPdf", Guid.NewGuid().ToString());
+        Directory.CreateDirectory(tempDir);
+
+        var inputPath = Path.Combine(tempDir, Path.GetFileName(file.FileName));
         await using (var stream = new FileStream(inputPath, FileMode.Create))
         {
             await file.CopyToAsync(stream);
@@ -83,15 +87,22 @@ app.MapPost("/api/convert", async (HttpRequest request) =>
                 statusCode: 500
             );
 
-        var pdfBytes = await File.ReadAllBytesAsync(outputPath);
-        return Results.File(pdfBytes, "application/pdf", outputFileName);
+        // Defer cleanup — stream directly from disk
+        cleanupNeeded = false;
+        var dirForCleanup = tempDir;
+        request.HttpContext.Response.OnCompleted(() =>
+        {
+            try { if (Directory.Exists(dirForCleanup)) Directory.Delete(dirForCleanup, true); } catch { }
+            return Task.CompletedTask;
+        });
+
+        return Results.File(outputPath, "application/pdf", outputFileName);
     }
     finally
     {
-        if (Directory.Exists(tempDir))
+        if (cleanupNeeded && tempDir != null && Directory.Exists(tempDir))
         {
-            try { Directory.Delete(tempDir, true); }
-            catch { /* best effort cleanup */ }
+            try { Directory.Delete(tempDir, true); } catch { }
         }
     }
 });

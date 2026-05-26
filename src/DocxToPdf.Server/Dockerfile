@@ -12,7 +12,7 @@ RUN dotnet publish -c Release -o /app
 # Runtime image with LibreOffice
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends libreoffice && \
+    apt-get install -y --no-install-recommends libreoffice-writer && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 

@@ -6,7 +6,6 @@
 ### Server
 - Тестирование endpoint /api/convert через WebApplicationFactory
 - Проверка валидации (неверный формат, превышение размера)
-- Mock для LibreOffice (замена Process.Start на тестовый)
 
 ### Client
 - Компонентные тесты с Vitest
