@@ -100,3 +100,5 @@ app.Run();
 
 public record ErrorResponse(string Message);
 
+
+public partial class Program { }

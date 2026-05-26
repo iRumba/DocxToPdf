@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/DocxToPdf.AppHost/DocxToPdf.AppHost.csproj" />
+    <Project Path="src/DocxToPdf.Server.Tests/DocxToPdf.Server.Tests.csproj" />
     <Project Path="src/DocxToPdf.Server/DocxToPdf.Server.csproj" />
     <Project Path="src/DocxToPdf.ServiceDefaults/DocxToPdf.ServiceDefaults.csproj" />
   </Folder>
