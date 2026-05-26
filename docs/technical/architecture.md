@@ -5,15 +5,16 @@
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │  Browser (React SPA)                                        │
-│  ┌──────────────┐    POST /api/convert (multipart)          │
-│  │  Drop Zone    │ ──────────────────────────────────────┐  │
-│  │  + File Info  │                                       │  │
-│  └──────────────┘                                       │  │
-│         │                                                │  │
-│         ▼                                                │  │
-│  ┌──────────────┐    GET /api/convert/{id}/download       │  │
-│  │  Download     │ ◄────────────────────────────────────┘  │
-│  └──────────────┘                                          │
+│  ┌──────────────┐                                           │
+│  │  Drop Zone    │ ── POST /api/convert (multipart) ────┐   │
+│  │  + File Info  │                                       │   │
+│  └──────────────┘                                       │   │
+│         │                                                │   │
+│         ▼                                                │   │
+│  ┌──────────────┐                                        │   │
+│  │  Auto-download│ ◄── PDF bytes (application/pdf) ◄────┘   │
+│  │  PDF result   │                                            │
+│  └──────────────┘                                            │
 └──────────────────────────────────────────────────────────────┘
                                 │
                                 ▼
@@ -24,9 +25,8 @@
 │    ├── Validate file (.docx, size ≤ 50MB)                    │
 │    ├── Save to temp directory                                │
 │    ├── Run: soffice --headless --convert-to pdf              │
-│    ├── Read PDF from temp                                    │
-│    ├── Return File(pdfBytes, "application/pdf")              │
-│    └── Cleanup temp (finally)                                │
+│    ├── Stream PDF directly from disk via Results.File        │
+│    └── Cleanup temp via OnCompleted callback                 │
 │                                                              │
 │  GET /api/health                                             │
 │    └── Return { status: "healthy" }                          │
